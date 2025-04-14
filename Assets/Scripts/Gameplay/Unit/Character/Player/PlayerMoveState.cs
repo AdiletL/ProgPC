@@ -5,6 +5,8 @@ namespace Unit.Character.Player
 {
     public class PlayerMoveState : State, IMovement
     {
+        public override StateCategory Category { get; } = StateCategory.Move;
+        
         private SO_PlayerMove so_PlayerMove;
         private CharacterController characterController;
         private GameObject gameObject;
@@ -21,7 +23,7 @@ namespace Unit.Character.Player
         public void SetCharacterController(CharacterController characterController) => this.characterController = characterController;
         public void SetGameObject(GameObject gameObject) => this.gameObject = gameObject;
         public void SetHead(GameObject head) => this.head = head;
-        
+
 
         public override void Initialize()
         {
@@ -30,23 +32,13 @@ namespace Unit.Character.Player
             directionGravity = Physics.gravity;
         }
 
-        public override void Enter()
-        {
-            
-        }
-
         public override void Update()
         {
             CheckDirectionMovement();
             ExecuteMovement();
 
             if (direction.magnitude == 0)
-                StateMachine.ChangeState(typeof(PlayerIdleState));
-        }
-
-        public override void Exit()
-        {
-            
+                StateMachine.ExitCategory(Category, null);
         }
         
         private void CheckDirectionMovement()

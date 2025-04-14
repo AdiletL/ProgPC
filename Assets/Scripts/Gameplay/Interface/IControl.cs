@@ -1,5 +1,7 @@
 public interface IControl
 {
+    public void Activate();
+    public void Deactivate();
     public void UpdateInputHandler();
 }
 

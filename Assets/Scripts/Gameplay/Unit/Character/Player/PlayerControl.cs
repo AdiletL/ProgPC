@@ -11,6 +11,7 @@ namespace Unit.Character.Player
         private GameObject head;
         private float rotationSpeed;
         private bool isCanMovement = true;
+        private bool isCanControl;
         
         public PlayerControl(IStateMachine stateMachine, float rotationSpeed, GameObject head)
         {
@@ -20,6 +21,7 @@ namespace Unit.Character.Player
             SubscribeEvent();
 
             mouseLook = new MouseLook(this.head, this.rotationSpeed);
+            Activate();
         }
 
         ~PlayerControl()
@@ -29,29 +31,39 @@ namespace Unit.Character.Player
 
         public void SubscribeEvent()
         {
-            stateMachine.OnExitState += OnExitState;
+            stateMachine.OnExitCategory += OnExitCategory;
         }
 
         public void UnsubscribeEvent()
         {
-            stateMachine.OnExitState -= OnExitState;
+            stateMachine.OnExitCategory -= OnExitCategory;
         }
 
-        private void OnExitState(IState state)
+        private void OnExitCategory(IState state)
         {
             if (typeof(IMovement).IsAssignableFrom(state.GetType()))
                 isCanMovement = true;
         }
-        
+
+        public void Activate() => isCanControl = true;
+
+        public void Deactivate()
+        {
+            isCanControl = false;
+            stateMachine.ExitCategory(StateCategory.Move, null);
+        }
+
         public void UpdateInputHandler()
         {
+            if(!isCanControl) return;
+            
             if((Input.GetKey(KeyCode.A)
                || Input.GetKey(KeyCode.D)
                || Input.GetKey(KeyCode.W) 
                || Input.GetKey(KeyCode.S))
                && isCanMovement)
             {
-                stateMachine.ChangeState(typeof(PlayerMoveState));
+                stateMachine.ExitOtherStates(typeof(PlayerMoveState));
                 isCanMovement = false;
             }
             
