@@ -110,13 +110,15 @@ namespace Unit.Character.Player
                     isValidatePosition = true;
                     return;
                 }
-                
+
                 Vector3 normal = hit.normal;
                 float offset = CalculateOffset(normal);
                 
                 Vector3 position = hit.point + normal * offset;
                 currentBuildable.ChangePosition(position);
-                if (isCollisionBuildableObject)
+                
+                if (hit.collider.TryGetComponent(out IBuildable buildable)
+                    || isCollisionBuildableObject)
                 {
                     currentBuildable.ChangeColor(invalidatePlacementColor);
                     isValidatePosition = false;
